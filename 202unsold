@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+
+##
+## EPITECH PROJECT, 2020
+## 202unsold
+## File description:
+## 202unsold
+##
+
+import sys
+
+class Unsold():
+    def __init__(self, firstClothPrice, secondClothPrice):
+        self.a = firstClothPrice
+        self.b = secondClothPrice
+        self.errorGest()
+        self.probaArray = self.porbaArrayToSell()
+        self.zLaw = []
+        self.expectedValue = []
+        self.displayResult()
+
+    def permutation(self, nbPermutation):
+        totalPermutation = 1
+        i = 1
+        while (i <= nbPermutation):
+            totalPermutation *= i
+            i += 1
+        return totalPermutation
+
+    def factorial(self, nbCombination, nbElem):
+        return (self.permutation(nbElem) / 
+        (self.permutation(nbCombination) *
+        self.permutation(nbElem - nbCombination)))
+
+    def porbaArrayToSell(self):
+        probaArray = []
+        for y in range(10, 60, 10):
+            for x in range(10, 60, 10):
+                probaArray.append(self.probaToSell(x, y))
+        return probaArray
+
+    def probaToSell(self, x, y):
+        return ((self.a - x) * (self.b - y)) / ((5 * self.a - 150) * (5 * self.b - 150))
+
+    def xProbaSum(self, toIndex):
+        sum = 0
+        for x in range(toIndex - 4, toIndex + 1, 1):
+            sum += self.probaArray[x]
+        return sum
+
+    def yProbaSum(self, fromIndex):
+        sum = 0
+        for x in range(fromIndex, fromIndex + 21, 5):
+            sum += self.probaArray[x]
+        return sum
+
+    def calcVariance(self, cloth, excpected):
+        result = 0
+        for x in range(10, 60, 10):
+            result += pow(x, 2) * ((cloth - x) / (5 * cloth - 150))
+        return result - pow(excpected, 2)
+
+    def displayMatrix(self):
+        print("\tX=10\tX=20\tX=30\tX=40\tX=50\tY law")
+        print("Y=10\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}".format(
+        round(self.probaArray[0], 3), round(self.probaArray[1], 3), round(self.probaArray[2], 3),
+        round(self.probaArray[3], 3), round(self.probaArray[4], 3), self.xProbaSum(4)))
+        
+        print("Y=20\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}".format(
+        round(self.probaArray[5], 3), round(self.probaArray[6], 3), round(self.probaArray[7], 3),
+        round(self.probaArray[8], 3), round(self.probaArray[9], 3), self.xProbaSum(9)))
+        
+        print("Y=30\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}".format(
+        round(self.probaArray[10], 3), round(self.probaArray[11], 3), round(self.probaArray[12], 3),
+        round(self.probaArray[13], 3), round(self.probaArray[14], 3), self.xProbaSum(14)))
+
+        print("Y=40\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}".format(
+        round(self.probaArray[15], 3), round(self.probaArray[16], 3), round(self.probaArray[17], 3),
+        round(self.probaArray[18], 3), round(self.probaArray[19], 3), self.xProbaSum(19)))
+
+        print("Y=50\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}".format(
+        round(self.probaArray[20], 3), round(self.probaArray[21], 3), round(self.probaArray[22], 3),
+        round(self.probaArray[23], 3), round(self.probaArray[24], 3), self.xProbaSum(24)))
+
+        print("X law\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}\t{:.3f}".format(
+        self.yProbaSum(0), self.yProbaSum(1), self.yProbaSum(2),
+        self.yProbaSum(3), self.yProbaSum(4), 1.000))
+
+    def displayLaw(self):
+        self.zLaw = [
+            self.probaArray[0],
+            self.probaArray[1] + self.probaArray[5],
+            self.probaArray[2] + self.probaArray[6] + self.probaArray[10],
+            self.probaArray[3] + self.probaArray[7] + self.probaArray[11] + self.probaArray[15],
+            self.probaArray[4] + self.probaArray[8] + self.probaArray[12] + self.probaArray[16] + self.probaArray[20],
+            self.probaArray[9] + self.probaArray[13] + self.probaArray[17] + self.probaArray[21],
+            self.probaArray[14] + self.probaArray[18] + self.probaArray[22],
+            self.probaArray[19] + self.probaArray[23],
+            self.probaArray[24]
+        ]
+        print("z\t20\t30\t40\t50\t60\t70\t80\t90\t100")
+        print("p(Z=z)", end='')
+        print("\t{:.3f}".format(self.zLaw[0]), end='')
+        print("\t{:.3f}".format(self.zLaw[1]), end='')
+        print("\t{:.3f}".format(self.zLaw[2]), end='')
+        print("\t{:.3f}".format(self.zLaw[3]), end='')
+        print("\t{:.3f}".format(self.zLaw[4]), end='')
+        print("\t{:.3f}".format(self.zLaw[5]), end='')
+        print("\t{:.3f}".format(self.zLaw[6]), end='')
+        print("\t{:.3f}".format(self.zLaw[7]), end='')
+        print("\t{:.3f}".format(self.zLaw[8]))
+
+    def displayVarianceAndExpected(self):
+        self.expectedValue.append(10 * self.yProbaSum(0) + 20 * self.yProbaSum(1) +
+        30 * self.yProbaSum(2) + 40 * self.yProbaSum(3) + 50 * self.yProbaSum(4))
+
+        self.expectedValue.append(10 * self.xProbaSum(4) + 20 * self.xProbaSum(9) +
+        30 * self.xProbaSum(14) + 40 * self.xProbaSum(19) + 50 * self.xProbaSum(24))
+        
+        self.expectedValue.append(20 * self.zLaw[0] + 30 * self.zLaw[1] +
+        40 * self.zLaw[2] + 50 * self.zLaw[3] + 60 * self.zLaw[4] + 70 * self.zLaw[5] +
+        80 * self.zLaw[6] + 90 * self.zLaw[7] + 100 * self.zLaw[8])
+
+        print("expected value of X:\t{:.1f}".format(self.expectedValue[0]))
+        print("variance of X:\t\t{:.1f}".format(self.calcVariance(self.a, self.expectedValue[0])))
+        print("expected value of Y:\t{:.1f}".format(self.expectedValue[1]))
+        print("variance of Y:\t\t{:.1f}".format(self.calcVariance(self.b, self.expectedValue[1])))
+        print("expected value of Z:\t{:.1f}".format(self.expectedValue[2]))
+        print("variance of Z:\t\t{:.1f}".format(self.calcVariance(self.a, self.expectedValue[0]) +
+        self.calcVariance(self.b, self.expectedValue[1])))
+
+    def displayResult(self):
+        print("--------------------------------------------------------------------------------")
+        self.displayMatrix()
+        print("--------------------------------------------------------------------------------")
+        self.displayLaw()
+        print("--------------------------------------------------------------------------------")
+        self.displayVarianceAndExpected()
+        print("--------------------------------------------------------------------------------")
+
+    def errorGest(self):
+        try:
+            if (len(self.a) != len(str(int(self.a))) or len(self.b) != len(str(int(self.b)))):
+                exit(84)
+        except:
+            exit(84)
+        self.a = int(self.a)
+        self.b = int(self.b)
+        if (self.a < 50 or self.b < 50):
+            exit(84)
+
+def help():
+    file = open("README.md", "r")
+    print(file.read())
+
+def main():
+    lengthArgv = len(sys.argv)
+    if (lengthArgv < 2 or lengthArgv > 3):
+        exit(84)
+    if (lengthArgv == 2 and sys.argv[1] == "-h"):
+        help()
+    elif(lengthArgv == 3):
+        unsoldClothes = Unsold(sys.argv[1], sys.argv[2])
+        unsoldClothes.porbaArrayToSell()
+    else:
+        exit(84)
+
+if __name__ == "__main__":
+    main()
